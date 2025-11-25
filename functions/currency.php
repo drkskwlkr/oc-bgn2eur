@@ -64,9 +64,10 @@ function validate_currency_config($oc_root_path) {
     }
     
     $eur_data = mysqli_fetch_assoc($eur_result);
-    $expected_eur_value = number_format(1 / EUR_EXCHANGE_RATE, 8, '.', '');
-    
-    if ($eur_data['value'] !== $expected_eur_value) {
+    $expected_eur_value = round(1 / EUR_EXCHANGE_RATE, 5);
+    $actual_eur_value = round((float)$eur_data['value'], 5);
+
+    if ($actual_eur_value !== $expected_eur_value) {
         mysqli_close($conn);
         return ['error' => 'Неправилен обменен курс за EUR. Очакван: ' . $expected_eur_value . ', намерен: ' . $eur_data['value']];
     }

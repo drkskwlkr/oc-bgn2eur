@@ -36,7 +36,18 @@ switch ($command) {
         echo "Потребител: " . $result['username'] . "\n";
         echo "Префикс:    " . $result['prefix'] . "\n";
         break;
+
+    case 'currency':
+        require_once 'functions/currency.php';
+        $result = validate_currency_config(OC_ROOT_PATH);
         
+        if (isset($result['error'])) {
+            die("Грешка: " . $result['error'] . "\n");
+        }
+        
+        echo $result['message'] . "\n";
+        break;
+
     default:
         die("Грешка: непозната команда '$command'\n");
 }
