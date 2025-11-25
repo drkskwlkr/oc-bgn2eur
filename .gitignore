@@ -1,0 +1,21 @@
+# Configuration files with sensitive data
+config.local.php
+
+# Backup files
+*.bak
+*.sql
+backups/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
