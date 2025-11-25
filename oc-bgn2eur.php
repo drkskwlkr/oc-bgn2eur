@@ -17,7 +17,7 @@ if (php_sapi_name() === 'cli') {
 }
 
 if (empty($command)) {
-    die("Error: No command specified\n");
+    die("Грешка: не е подадена команда\n");
 }
 
 // Command routing
@@ -27,16 +27,16 @@ switch ($command) {
         $result = discover_oc_installation(OC_ROOT_PATH);
         
         if (isset($result['error'])) {
-            die("Error: " . $result['error'] . "\n");
+            die("Грешка: " . $result['error'] . "\n");
         }
         
         // Output non-sensitive data only
-        echo "OpenCart installation discovered:\n";
-        echo "Database: " . $result['database'] . "\n";
-        echo "User: " . $result['username'] . "\n";
-        echo "Prefix: " . $result['prefix'] . "\n";
+        echo "Намерена е OpenCart инсталация.\n";
+        echo "База данни: " . $result['database'] . "\n";
+        echo "Потребител: " . $result['username'] . "\n";
+        echo "Префикс:    " . $result['prefix'] . "\n";
         break;
         
     default:
-        die("Error: Unknown command '$command'\n");
+        die("Грешка: непозната команда '$command'\n");
 }
