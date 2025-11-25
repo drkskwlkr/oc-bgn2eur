@@ -14,18 +14,18 @@ function discover_oc_installation($oc_root_path) {
     
     // Verify both config files exist
     if (!file_exists($config_file)) {
-        return ['error' => 'config.php not found at: ' . $config_file];
+        return ['error' => 'config.php не е намерен на: ' . $config_file];
     }
     
     if (!file_exists($admin_config_file)) {
-        return ['error' => 'admin/config.php not found at: ' . $admin_config_file];
+        return ['error' => 'admin/config.php не е намерен на: ' . $admin_config_file];
     }
     
     // Read and parse config.php
     $config_content = file_get_contents($config_file);
     
     if ($config_content === false) {
-        return ['error' => 'Unable to read config.php'];
+        return ['error' => 'Не може да се прочете config.php'];
     }
     
     // Extract database credentials using regex
@@ -41,7 +41,7 @@ function discover_oc_installation($oc_root_path) {
     // Verify all required credentials were found
     foreach ($credentials as $key => $value) {
         if ($value === false) {
-            return ['error' => 'Unable to extract DB_' . strtoupper($key) . ' from config.php'];
+            return ['error' => 'Не може да се извлече DB_' . strtoupper($key) . ' от config.php'];
         }
     }
     
