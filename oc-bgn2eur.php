@@ -47,6 +47,17 @@ switch ($command) {
         
         echo $result['message'] . "\n";
         break;
+    
+    case 'recalculate':
+        require_once 'functions/recalculate.php';
+        $result = recalculate_prices(OC_ROOT_PATH);
+        
+        if (isset($result['error'])) {
+            die("Грешка: " . $result['error'] . "\n");
+        }
+        
+        echo $result['message'] . "\n";
+        break;
 
     default:
         die("Грешка: непозната команда '$command'\n");
