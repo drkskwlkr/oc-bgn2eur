@@ -69,6 +69,17 @@ switch ($command) {
         
         echo $result['message'] . "\n";
         break;
+    
+    case 'stat':
+        require_once 'functions/stat.php';
+        $result = display_statistics(OC_ROOT_PATH);
+        
+        if (isset($result['error'])) {
+            die("Грешка: " . $result['error'] . "\n");
+        }
+        
+        echo $result['message'] . "\n";
+        break;
 
     default:
         die("Грешка: непозната команда '$command'\n");
