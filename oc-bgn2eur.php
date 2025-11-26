@@ -104,7 +104,18 @@ switch ($command) {
         
         echo $result['message'] . "\n";
         break;
-      
+
+    case 'cleanup':
+        require_once 'functions/cleanup.php';
+        $result = cleanup_backups(OC_ROOT_PATH);
+        
+        if (isset($result['error'])) {
+            die("Грешка: " . $result['error'] . "\n");
+        }
+        
+        echo $result['message'] . "\n";
+        break;
+     
     default:
         die("Грешка: непозната команда '$command'\n");
 
