@@ -81,6 +81,17 @@ switch ($command) {
         echo $result['message'] . "\n";
         break;
 
+    case 'backup':
+        require_once 'functions/backup.php';
+        $result = backup_tables(OC_ROOT_PATH);
+
+        if (isset($result['error'])) {
+            die("Грешка: " . $result['error'] . "\n");
+        }
+
+        echo $result['message'] . "\n";
+        break;
+
     default:
         die("Грешка: непозната команда '$command'\n");
 }
