@@ -94,6 +94,17 @@ switch ($command) {
         echo $result['message'] . "\n";
         break;
 
+    case 'restore':
+        require_once 'functions/restore.php';
+        $result = restore_tables(OC_ROOT_PATH);
+        
+        if (isset($result['error'])) {
+            die("Грешка: " . $result['error'] . "\n");
+        }
+        
+        echo $result['message'] . "\n";
+        break;
+      
     default:
         die("Грешка: непозната команда '$command'\n");
 
