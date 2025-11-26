@@ -84,6 +84,20 @@ function display_statistics($oc_root_path) {
     echo "  Отстъпки (tiers):  " . number_format($discount_prices, 0, '.', ' ') . "\n";
     echo "  Промоции:          " . number_format($special_prices, 0, '.', ' ') . "\n";
     
+    // Calculate estimated memory usage for list command
+    $estimated_memory_mb = (
+        ($total_products * 0.5) +        // ~0.5KB per product
+        ($option_values * 0.3) +         // ~0.3KB per option
+        ($discount_prices * 0.3) +       // ~0.3KB per discount
+        ($special_prices * 0.3)          // ~0.3KB per special
+    ) / 1024;
+    
+    echo "\nОчаквано използване на RAM за 'list': ~" . number_format($estimated_memory_mb, 1) . " MB\n";
+    
+    if ($estimated_memory_mb > 64) {
+        echo "⚠ ВНИМАНИЕ: Очакваното използване надхвърля 64 MB\n";
+    }
+    
     echo "\n" . str_repeat('=', 50) . "\n";
     
     return [
