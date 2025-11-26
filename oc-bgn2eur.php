@@ -57,7 +57,7 @@ switch ($command) {
 
         // Check if this is a dry run or actual execution
         $proceed = ($param === 'proceed');
-        $result = recalculate_prices(OC_ROOT_PATH, $proceed);
+	$result = recalculate_prices(OC_ROOT_PATH, $proceed, $param);
         
         if (isset($result['error'])) {
             die("Грешка: " . $result['error'] . "\n");
