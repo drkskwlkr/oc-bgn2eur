@@ -54,7 +54,10 @@ switch ($command) {
     
     case 'recalculate':
         require_once 'functions/recalculate.php';
-        $result = recalculate_prices(OC_ROOT_PATH);
+
+        // Check if this is a dry run or actual execution
+        $proceed = ($param === 'proceed');
+        $result = recalculate_prices(OC_ROOT_PATH, $proceed);
         
         if (isset($result['error'])) {
             die("Грешка: " . $result['error'] . "\n");
