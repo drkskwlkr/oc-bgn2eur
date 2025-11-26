@@ -11,9 +11,11 @@ require_once 'config.local.php';
 if (php_sapi_name() === 'cli') {
     // CLI mode: php oc-bgn2eur.php discover
     $command = isset($argv[1]) ? $argv[1] : null;
+    $param = isset($argv[2]) ? $argv[2] : null;
 } else {
     // Web mode: oc-bgn2eur.php?cmd=discover
     $command = isset($_GET['cmd']) ? $_GET['cmd'] : null;
+    $param = isset($_GET['param']) ? $_GET['param'] : null;
     header('Content-Type: text/html; charset=utf-8');
     echo '<pre>';
 }
