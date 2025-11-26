@@ -20,7 +20,8 @@ function recalculate_prices($oc_root_path, $proceed = false) {
     echo "✓ Открита OpenCart инсталация\n";
     echo "  База данни: " . $discovery['database'] . "\n";
     echo "  Префикс: " . $discovery['prefix'] . "\n\n";
-    
+    echo "  Обменен курс: 1 EUR = " . EUR_EXCHANGE_RATE . " BGN\n\n";    
+
     // Step 2: Validate currency configuration
     require_once 'functions/currency.php';
     $currency_check = validate_currency_config($oc_root_path);
