@@ -50,6 +50,24 @@ function display_statistics($oc_root_path) {
     $inactive_row = mysqli_fetch_assoc($inactive_result);
     $inactive_products = $inactive_row['total'];
     
+    // Get product option values count
+    $options_query = "SELECT COUNT(*) as total FROM {$prefix}product_option_value";
+    $options_result = mysqli_query($conn, $options_query);
+    $options_row = mysqli_fetch_assoc($options_result);
+    $option_values = $options_row['total'];
+    
+    // Get product discounts count
+    $discounts_query = "SELECT COUNT(*) as total FROM {$prefix}product_discount";
+    $discounts_result = mysqli_query($conn, $discounts_query);
+    $discounts_row = mysqli_fetch_assoc($discounts_result);
+    $discount_prices = $discounts_row['total'];
+    
+    // Get product special prices count
+    $specials_query = "SELECT COUNT(*) as total FROM {$prefix}product_special";
+    $specials_result = mysqli_query($conn, $specials_query);
+    $specials_row = mysqli_fetch_assoc($specials_result);
+    $special_prices = $specials_row['total'];
+    
     mysqli_close($conn);
     
     // Display statistics
@@ -59,7 +77,12 @@ function display_statistics($oc_root_path) {
     
     echo "Общо продукти:       " . number_format($total_products, 0, '.', ' ') . "\n";
     echo "Активни продукти:    " . number_format($active_products, 0, '.', ' ') . "\n";
-    echo "Неактивни продукти:  " . number_format($inactive_products, 0, '.', ' ') . "\n";
+    echo "Неактивни продукти:  " . number_format($inactive_products, 0, '.', ' ') . "\n\n";
+    
+    echo "Ценови вариации:\n";
+    echo "  Опции (variants):  " . number_format($option_values, 0, '.', ' ') . "\n";
+    echo "  Отстъпки (tiers):  " . number_format($discount_prices, 0, '.', ' ') . "\n";
+    echo "  Промоции:          " . number_format($special_prices, 0, '.', ' ') . "\n";
     
     echo "\n" . str_repeat('=', 50) . "\n";
     
