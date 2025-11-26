@@ -14,6 +14,8 @@ if (php_sapi_name() === 'cli') {
 } else {
     // Web mode: oc-bgn2eur.php?cmd=discover
     $command = isset($_GET['cmd']) ? $_GET['cmd'] : null;
+    header('Content-Type: text/html; charset=utf-8');
+    echo '<pre>';
 }
 
 if (empty($command)) {
@@ -94,4 +96,8 @@ switch ($command) {
 
     default:
         die("Грешка: непозната команда '$command'\n");
+
+    if (php_sapi_name() !== 'cli') {
+        echo '</pre>';
+    }
 }
