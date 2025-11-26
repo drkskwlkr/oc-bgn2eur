@@ -8,6 +8,8 @@
  * @return array Result with success status and message
  */
 function list_products($oc_root_path) {
+    $memory_start = memory_get_usage();
+    
     require_once 'functions/discover.php';
     
     // Get database credentials
@@ -85,6 +87,50 @@ function list_products($oc_root_path) {
         $model_width = 5; // Minimum width for "Модел" header
     }
     
+    // Preload all option values grouped by product_id
+    $options_query = "SELECT product_id FROM {$prefix}product_option_value";
+    $options_result = mysqli_query($conn, $options_query);
+    $options_by_product = [];
+    
+    while ($option = mysqli_fetch_assoc($options_result)) {
+        $pid = $option['product_id'];
+        if (!isset($options_by_product[$pid])) {
+            $options_by_product[$pid] = 0;
+        }
+        $options_by_product[$pid]++;
+    }
+    
+    // Preload all discounts grouped by product_id
+    $discounts_query = "SELECT product_id FROM {$prefix}product_discount";
+    $discounts_result = mysqli_query($conn, $discounts_query);
+    $discounts_by_product = [];
+    
+    while ($discount = mysqli_fetch_assoc($discounts_result)) {
+        $pid = $discount['product_id'];
+        if (!isset($discounts_by_product[$pid])) {
+            $discounts_by_product[$pid] = 0;
+        }
+        $discounts_by_product[$pid]++;
+    }
+    
+    // Preload all special prices grouped by product_id
+    $specials_query = "SELECT product_id FROM {$prefix}product_special";
+    $specials_result = mysqli_query($conn, $specials_query);
+    $specials_by_product = [];
+    
+    while ($special = mysqli_fetch_assoc($specials_result)) {
+        $pid = $special['product_id'];
+        if (!isset($specials_by_product[$pid])) {
+            $specials_by_product[$pid] = 0;
+        }
+        $specials_by_product[$pid]++;
+    }
+    
+    mysqli_close($conn);
+    
+    // Calculate indent for nested lines
+    $indent = str_repeat(' ', $id_width + 3); // ID width + " | "
+    
     // Output header
     echo str_repeat('-', 80) . "\n";
     echo str_pad('ID', $id_width) . " | Статус    | Цена      | " . str_pad('Модел', $model_width) . " | Име\n";
@@ -102,13 +148,35 @@ function list_products($oc_root_path) {
         $name = substr($product['name'], 0, 40);
         
         echo "{$product_id} | {$status} | {$price_padded} | {$model} | {$name}\n";
+        
+        // Display nested price variations if present
+        $pid = $product['product_id'];
+        
+        if (isset($options_by_product[$pid]) && $options_by_product[$pid] > 0) {
+            echo "{$indent}↪ Полета цени опции: {$options_by_product[$pid]}\n";
+        }
+        
+        if (isset($discounts_by_product[$pid]) && $discounts_by_product[$pid] > 0) {
+            echo "{$indent}↪ Полета цени за количества: {$discounts_by_product[$pid]}\n";
+        }
+        
+        if (isset($specials_by_product[$pid]) && $specials_by_product[$pid] > 0) {
+            echo "{$indent}↪ Полета промо цени: {$specials_by_product[$pid]}\n";
+        }
+        
         $product_count++;
     }
     
     echo str_repeat('-', 80) . "\n";
     echo "Общо продукти: {$product_count}\n";
     
-    mysqli_close($conn);
+    // Calculate memory usage
+    $memory_end = memory_get_usage();
+    $memory_used = ($memory_end - $memory_start) / 1024 / 1024;
+    $memory_peak = memory_get_peak_usage() / 1024 / 1024;
+    
+    echo "\nИзползвана RAM: " . number_format($memory_used, 2) . " MB\n";
+    echo "Пикова RAM: " . number_format($memory_peak, 2) . " MB\n";
     
     return [
         'success' => true,
