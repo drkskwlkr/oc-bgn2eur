@@ -67,20 +67,38 @@ function list_products($oc_root_path) {
         return ['error' => 'Грешка при извличане на продукти: ' . mysqli_error($conn)];
     }
     
+    // Calculate maximum model length and store products
+    $max_model_length = 0;
+    $products = [];
+    
+    while ($product = mysqli_fetch_assoc($products_result)) {
+        $products[] = $product;
+        $model_length = strlen($product['model']);
+        if ($model_length > $max_model_length && $model_length <= 30) {
+            $max_model_length = $model_length;
+        }
+    }
+    
+    // Cap model width at 30 characters
+    $model_width = min($max_model_length, 30);
+    if ($model_width < 5) {
+        $model_width = 5; // Minimum width for "Модел" header
+    }
+    
     // Output header
     echo str_repeat('-', 80) . "\n";
-    echo str_pad('ID', $id_width) . " | Статус    | Цена      | Модел | Име\n";
+    echo str_pad('ID', $id_width) . " | Статус    | Цена      | " . str_pad('Модел', $model_width) . " | Име\n";
     echo str_repeat('-', 80) . "\n";
     
     $product_count = 0;
     
     // Output products
-    while ($product = mysqli_fetch_assoc($products_result)) {
+    foreach ($products as $product) {
         $product_id = str_pad($product['product_id'], $id_width, ' ', STR_PAD_LEFT);
         $status = $product['status'] === '1' ? 'Активен  ' : 'Неактивен';
         $price = number_format((float)$product['price'], 2, '.', '');
         $price_padded = str_pad($price, 9, ' ', STR_PAD_LEFT);
-        $model = substr($product['model'], 0, 20);
+        $model = str_pad(substr($product['model'], 0, $model_width), $model_width, ' ', STR_PAD_RIGHT);
         $name = substr($product['name'], 0, 40);
         
         echo "{$product_id} | {$status} | {$price_padded} | {$model} | {$name}\n";
