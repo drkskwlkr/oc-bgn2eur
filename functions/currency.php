@@ -55,7 +55,7 @@ function validate_currency_config($oc_root_path) {
     }
     
     // Check EUR currency
-    $eur_query = "SELECT value FROM {$prefix}currency WHERE code = 'EUR'";
+    $eur_query = "SELECT status FROM {$prefix}currency WHERE code = 'EUR'";
     $eur_result = mysqli_query($conn, $eur_query);
     
     if (!$eur_result || mysqli_num_rows($eur_result) === 0) {
@@ -64,18 +64,18 @@ function validate_currency_config($oc_root_path) {
     }
     
     $eur_data = mysqli_fetch_assoc($eur_result);
-    $expected_eur_value = round(1 / EUR_EXCHANGE_RATE, 5);
-    $actual_eur_value = round((float)$eur_data['value'], 5);
-
-    if ($actual_eur_value !== $expected_eur_value) {
-        mysqli_close($conn);
-        return ['error' => 'Неправилен обменен курс за EUR. Очакван: ' . $expected_eur_value . ', намерен: ' . $eur_data['value']];
-    }
+    $eur_status = $eur_data['status'] === '1' ? 'активна' : 'неактивна';
     
     mysqli_close($conn);
     
     return [
         'success' => true,
-        'message' => 'Валидна конфигурация на валути: BGN е основна валута, обменният курс за EUR е правилен'
+        'message' => "Валидна конфигурация на валути:\n" .
+                     "  - BGN е основна валута (value = 1.00000000, status = 1)\n" .
+                     "  - EUR съществува и е {$eur_status}\n\n" .
+                     "БЕЛЕЖКА: След преминаване към EUR, трябва да:\n" .
+                     "  1. Активирате EUR (ако е неактивна)\n" .
+                     "  2. Зададете обменен курс EUR = 1.00000000\n" .
+                     "  3. Деактивирате BGN"
     ];
 }
