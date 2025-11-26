@@ -117,7 +117,22 @@ switch ($command) {
         
         echo $result['message'] . "\n";
         break;
-     
+    
+    case 'maintenance':
+        if (empty($param)) {
+            die("Грешка: липсва параметър. Използвайте 'enable' или 'disable'.\n");
+        }
+        
+        require_once 'functions/maintenance.php';
+        $result = toggle_maintenance(OC_ROOT_PATH, $param);
+        
+        if (isset($result['error'])) {
+            die("Грешка: " . $result['error'] . "\n");
+        }
+        
+        echo $result['message'] . "\n";
+	break;
+
     default:
         die("Грешка: непозната команда '$command'\n");
 
