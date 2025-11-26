@@ -58,6 +58,17 @@ switch ($command) {
         
         echo $result['message'] . "\n";
         break;
+    
+    case 'list':
+        require_once 'functions/list.php';
+        $result = list_products(OC_ROOT_PATH);
+        
+        if (isset($result['error'])) {
+            die("Грешка: " . $result['error'] . "\n");
+        }
+        
+        echo $result['message'] . "\n";
+        break;
 
     default:
         die("Грешка: непозната команда '$command'\n");
