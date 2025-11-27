@@ -126,12 +126,17 @@ function recalculate_prices($oc_root_path, $proceed = false, $param = null) {
         $flag_result = mysqli_query($conn, $check_flag_query);
         
         if ($flag_result && mysqli_num_rows($flag_result) > 0) {
-            mysqli_close($conn);
-            return ['error' => 'Конверсията вече е била изпълнена! За да я изпълните отново, първо използвайте командата "restore" или "reset".'];
+            $flag_row = mysqli_fetch_assoc($flag_result);
+            if ($flag_row['value'] === '1') {
+                mysqli_close($conn);
+                return ['error' => 'Конверсията вече е била изпълнена! За да я изпълните отново, първо използвайте командата "restore" или "reset".'];
+            }
         }
         
-        // Set conversion flag BEFORE starting conversion
-        $set_flag_query = "INSERT INTO {$prefix}setting (`code`, `key`, `value`, `serialized`) VALUES ('config', 'bgn_eur_converted', '1', 0)";
+        // Set conversion flag BEFORE starting conversion (insert or update to 1)
+        $set_flag_query = "INSERT INTO {$prefix}setting (`code`, `key`, `value`, `serialized`) 
+                          VALUES ('config', 'bgn_eur_converted', '1', 0)
+                          ON DUPLICATE KEY UPDATE value = '1'";
         if (!mysqli_query($conn, $set_flag_query)) {
             mysqli_close($conn);
             return ['error' => 'Грешка при задаване на флаг за конверсия: ' . mysqli_error($conn)];

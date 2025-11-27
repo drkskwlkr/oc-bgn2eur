@@ -50,17 +50,28 @@ function reset_conversion_flag($oc_root_path) {
         ];
     }
     
-    // Remove conversion flag
-    $delete_query = "DELETE FROM {$prefix}setting WHERE `key` = 'bgn_eur_converted'";
+    $flag_row = mysqli_fetch_assoc($check_result);
     
-    if (!mysqli_query($conn, $delete_query)) {
+    if ($flag_row['value'] === '0') {
         mysqli_close($conn);
-        return ['error' => 'Грешка при премахване на флаг: ' . mysqli_error($conn)];
+        echo "Флагът за конверсия вече е нулиран.\n";
+        return [
+            'success' => true,
+            'message' => 'Няма нужда от reset'
+        ];
+    }
+    
+    // Unset conversion flag
+    $update_query = "UPDATE {$prefix}setting SET value = '0' WHERE `key` = 'bgn_eur_converted'";
+    
+    if (!mysqli_query($conn, $update_query)) {
+        mysqli_close($conn);
+        return ['error' => 'Грешка при нулиране на флаг: ' . mysqli_error($conn)];
     }
     
     mysqli_close($conn);
     
-    echo "✓ Флагът за конверсия е премахнат.\n";
+    echo "✓ Флагът за конверсия е нулиран.\n";
     echo "\nВече можете да изпълните конверсия отново.\n";
     echo "ВНИМАНИЕ: Уверете се, че наистина искате да конвертирате цените повторно!\n";
     

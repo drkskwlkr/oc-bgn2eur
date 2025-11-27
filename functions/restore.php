@@ -91,14 +91,14 @@ function restore_tables($oc_root_path) {
         echo "✓ {$backup_table} → {$source_table}\n";
     }
     
-    // Remove conversion flag since we're restoring to pre-conversion state
-    $remove_flag_query = "DELETE FROM {$prefix}setting WHERE `key` = 'bgn_eur_converted'";
-    mysqli_query($conn, $remove_flag_query);
+    // Unset conversion flag since we're restoring to pre-conversion state
+    $unset_flag_query = "UPDATE {$prefix}setting SET value = '0' WHERE `key` = 'bgn_eur_converted'";
+    mysqli_query($conn, $unset_flag_query);
     
     mysqli_close($conn);
     
     echo "\nВсички таблици са възстановени успешно.\n";
-    echo "Флагът за конверсия е премахнат.\n";
+    echo "Флагът за конверсия е нулиран.\n";
     
     return [
         'success' => true,
