@@ -59,6 +59,9 @@ function restore_tables($oc_root_path) {
     
     echo "\nВъзстановяване на таблици...\n\n";
     
+    // Temporarily disable strict mode to allow working with legacy table structures
+    mysqli_query($conn, "SET SESSION sql_mode = ''");
+    
     // Perform restore operation
     foreach ($tables as $table) {
         $source_table = $prefix . $table;
@@ -94,6 +97,9 @@ function restore_tables($oc_root_path) {
     // Unset conversion flag since we're restoring to pre-conversion state
     $unset_flag_query = "UPDATE {$prefix}setting SET value = '0' WHERE `key` = 'bgn_eur_converted'";
     mysqli_query($conn, $unset_flag_query);
+    
+    // Restore original SQL mode
+    mysqli_query($conn, "SET SESSION sql_mode = @@GLOBAL.sql_mode");
     
     mysqli_close($conn);
     

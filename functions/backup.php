@@ -42,6 +42,9 @@ function backup_tables($oc_root_path) {
     
     echo "Създаване на резервни копия на таблици...\n\n";
     
+    // Temporarily disable strict mode to allow copying legacy table structures
+    mysqli_query($conn, "SET SESSION sql_mode = ''");
+    
     foreach ($tables as $table) {
         $source_table = $prefix . $table;
         $backup_table = $prefix . 'backup_' . $table;
@@ -80,6 +83,9 @@ function backup_tables($oc_root_path) {
         
         echo "✓ {$source_table} → {$backup_table} (" . number_format($count_row['total'], 0, '.', ' ') . " записа)\n";
     }
+    
+    // Restore original SQL mode
+    mysqli_query($conn, "SET SESSION sql_mode = @@GLOBAL.sql_mode");
     
     mysqli_close($conn);
     
