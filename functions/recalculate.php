@@ -105,6 +105,41 @@ function recalculate_prices($oc_root_path, $proceed = false, $param = null) {
     $is_simulation = ($param === 'simulate');
     $mode_label = $is_simulation ? "СИМУЛАЦИЯ НА КОНВЕРСИЯ" : "СТАРТИРАНЕ НА КОНВЕРСИЯ";
     
+    // Check conversion flag for proceed mode
+    if (!$is_simulation) {
+        $conn = mysqli_connect(
+            $discovery['hostname'],
+            $discovery['username'],
+            $discovery['password'],
+            $discovery['database'],
+            $discovery['port']
+        );
+        
+        if (!$conn) {
+            return ['error' => 'Неуспешна връзка с базата данни: ' . mysqli_connect_error()];
+        }
+        
+        $prefix = $discovery['prefix'];
+        
+        // Check if conversion already done
+        $check_flag_query = "SELECT value FROM {$prefix}setting WHERE `key` = 'bgn_eur_converted'";
+        $flag_result = mysqli_query($conn, $check_flag_query);
+        
+        if ($flag_result && mysqli_num_rows($flag_result) > 0) {
+            mysqli_close($conn);
+            return ['error' => 'Конверсията вече е била изпълнена! За да я изпълните отново, първо използвайте командата "restore" или "reset".'];
+        }
+        
+        // Set conversion flag BEFORE starting conversion
+        $set_flag_query = "INSERT INTO {$prefix}setting (`code`, `key`, `value`, `serialized`) VALUES ('config', 'bgn_eur_converted', '1', 0)";
+        if (!mysqli_query($conn, $set_flag_query)) {
+            mysqli_close($conn);
+            return ['error' => 'Грешка при задаване на флаг за конверсия: ' . mysqli_error($conn)];
+        }
+        
+        mysqli_close($conn);
+    }
+    
     echo str_repeat('=', 60) . "\n";
     echo $mode_label . "\n";
     echo str_repeat('=', 60) . "\n\n";
@@ -227,8 +262,10 @@ function recalculate_prices($oc_root_path, $proceed = false, $param = null) {
         ];
     }
     
+    echo "Конверсията е завършена успешно!\n";
+    
     return [
         'success' => true,
-        'message' => 'Конверсията е завършена успешно!'
+        'message' => 'Всички цени са преизчислени и записани.'
     ];
 }
