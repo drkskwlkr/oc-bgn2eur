@@ -136,6 +136,17 @@ switch ($command) {
         echo $result['message'] . "\n";
 	break;
 
+    case 'reset':
+        require_once 'functions/reset.php';
+        $result = reset_conversion_flag(OC_ROOT_PATH);
+
+        if (isset($result['error'])) {
+            die("Грешка: " . $result['error'] . "\n");
+        }
+
+        echo $result['message'] . "\n";
+	break;
+
     default:
         die("Грешка: непозната команда '$command'\n");
 
