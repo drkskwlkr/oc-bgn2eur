@@ -68,12 +68,28 @@ function display_statistics($oc_root_path) {
     $specials_row = mysqli_fetch_assoc($specials_result);
     $special_prices = $specials_row['total'];
     
+    // Check conversion flag status
+    $flag_query = "SELECT value FROM {$prefix}setting WHERE `key` = 'bgn_eur_converted'";
+    $flag_result = mysqli_query($conn, $flag_query);
+    $conversion_status = "Не е изпълнявана";
+    
+    if ($flag_result && mysqli_num_rows($flag_result) > 0) {
+        $flag_row = mysqli_fetch_assoc($flag_result);
+        if ($flag_row['value'] === '1') {
+            $conversion_status = "Изпълнена (bgn_eur_converted = 1)";
+        } else {
+            $conversion_status = "Възстановена/Нулирана (bgn_eur_converted = 0)";
+        }
+    }
+    
     mysqli_close($conn);
     
     // Display statistics
     echo str_repeat('=', 50) . "\n";
     echo "СТАТИСТИКА ЗА ПРОДУКТИ\n";
     echo str_repeat('=', 50) . "\n\n";
+    
+    echo "Статус на конверсия: " . $conversion_status . "\n\n";
     
     echo "Общо продукти:       " . number_format($total_products, 0, '.', ' ') . "\n";
     echo "Активни продукти:    " . number_format($active_products, 0, '.', ' ') . "\n";

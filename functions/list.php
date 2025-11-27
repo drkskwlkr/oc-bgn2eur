@@ -126,10 +126,27 @@ function list_products($oc_root_path) {
         $specials_by_product[$pid]++;
     }
     
+    // Check conversion flag status
+    $flag_query = "SELECT value FROM {$prefix}setting WHERE `key` = 'bgn_eur_converted'";
+    $flag_result = mysqli_query($conn, $flag_query);
+    $conversion_status = "Не е изпълнявана";
+    
+    if ($flag_result && mysqli_num_rows($flag_result) > 0) {
+        $flag_row = mysqli_fetch_assoc($flag_result);
+        if ($flag_row['value'] === '1') {
+            $conversion_status = "Изпълнена";
+        } else {
+            $conversion_status = "Възстановена/Нулирана";
+        }
+    }
+    
     mysqli_close($conn);
     
     // Calculate indent for nested lines
     $indent = str_repeat(' ', $id_width + 3); // ID width + " | "
+    
+    // Display conversion status
+    echo "Статус на конверсия: " . $conversion_status . "\n\n";
     
     // Output header
     echo str_repeat('-', 80) . "\n";
