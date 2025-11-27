@@ -32,6 +32,18 @@ function backup_tables($oc_root_path) {
     
     $prefix = $db_config['prefix'];
     
+    // Check if conversion has already been done
+    $check_flag_query = "SELECT value FROM {$prefix}setting WHERE `key` = 'bgn_eur_converted'";
+    $flag_result = mysqli_query($conn, $check_flag_query);
+    
+    if ($flag_result && mysqli_num_rows($flag_result) > 0) {
+        $flag_row = mysqli_fetch_assoc($flag_result);
+        if ($flag_row['value'] === '1') {
+            mysqli_close($conn);
+            return ['error' => 'Не може да се прави backup след конверсия! Използвайте backup ПРЕДИ конверсия.'];
+        }
+    }
+    
     // Tables to backup
     $tables = [
         'product',
