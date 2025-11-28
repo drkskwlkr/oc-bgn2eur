@@ -153,6 +153,9 @@ function recalculate_prices($oc_root_path, $proceed = false, $param = null) {
         echo "ВНИМАНИЕ: Режим на симулация - промените НЯМА да бъдат записани!\n\n";
     }
     
+    // Start timing conversion
+    $time_start = microtime(true);
+    
     // Reconnect to database for conversion
     $conn = mysqli_connect(
         $discovery['hostname'],
@@ -167,7 +170,12 @@ function recalculate_prices($oc_root_path, $proceed = false, $param = null) {
     }
     
     $prefix = $discovery['prefix'];
-    $converted_count = 0;
+    
+    // Track conversion counts
+    $product_count = 0;
+    $option_count = 0;
+    $discount_count = 0;
+    $special_count = 0;
     
     // Convert product prices
     echo "Обработка на основни цени на продукти...\n";
@@ -185,13 +193,12 @@ function recalculate_prices($oc_root_path, $proceed = false, $param = null) {
             mysqli_query($conn, $update_query);
         }
         
-        $converted_count++;
+        $product_count++;
     }
     
-    echo "✓ Обработени {$converted_count} цени на продукти\n\n";
+    echo "✓ Обработени {$product_count} цени на продукти\n\n";
     
     // Convert product option values
-    $converted_count = 0;
     echo "Обработка на цени на опции...\n";
     $option_query = "SELECT product_option_value_id, price FROM {$prefix}product_option_value WHERE price != 0";
     $option_result = mysqli_query($conn, $option_query);
@@ -207,13 +214,12 @@ function recalculate_prices($oc_root_path, $proceed = false, $param = null) {
             mysqli_query($conn, $update_query);
         }
         
-        $converted_count++;
+        $option_count++;
     }
     
-    echo "✓ Обработени {$converted_count} цени на опции\n\n";
+    echo "✓ Обработени {$option_count} цени на опции\n\n";
     
     // Convert product discounts
-    $converted_count = 0;
     echo "Обработка на отстъпки...\n";
     $discount_query = "SELECT product_discount_id, price FROM {$prefix}product_discount WHERE price > 0";
     $discount_result = mysqli_query($conn, $discount_query);
@@ -229,13 +235,12 @@ function recalculate_prices($oc_root_path, $proceed = false, $param = null) {
             mysqli_query($conn, $update_query);
         }
         
-        $converted_count++;
+        $discount_count++;
     }
     
-    echo "✓ Обработени {$converted_count} отстъпки\n\n";
+    echo "✓ Обработени {$discount_count} отстъпки\n\n";
     
     // Convert product specials
-    $converted_count = 0;
     echo "Обработка на промоционални цени...\n";
     $special_query = "SELECT product_special_id, price FROM {$prefix}product_special WHERE price > 0";
     $special_result = mysqli_query($conn, $special_query);
@@ -251,14 +256,23 @@ function recalculate_prices($oc_root_path, $proceed = false, $param = null) {
             mysqli_query($conn, $update_query);
         }
         
-        $converted_count++;
+        $special_count++;
     }
     
-    echo "✓ Обработени {$converted_count} промоционални цени\n\n";
+    echo "✓ Обработени {$special_count} промоционални цени\n\n";
     
     mysqli_close($conn);
     
+    // Calculate performance metrics
+    $elapsed = microtime(true) - $time_start;
+    $total_converted = $product_count + $option_count + $discount_count + $special_count;
+    $rate = $total_converted / $elapsed;
+    
     echo str_repeat('=', 60) . "\n";
+    echo "Общо обработени ценови полета: " . number_format($total_converted, 0, '.', ' ') . "\n";
+    echo "Време за обработка: " . number_format($elapsed, 2) . " сек\n";
+    echo "Скорост: " . number_format($rate, 1) . " полета/сек\n";
+    echo str_repeat('=', 60) . "\n\n";
     
     if ($is_simulation) {
         return [

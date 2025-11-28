@@ -9,6 +9,7 @@
  */
 function list_products($oc_root_path) {
     $memory_start = memory_get_usage();
+    $time_start = microtime(true);
     
     require_once 'functions/discover.php';
     
@@ -187,12 +188,16 @@ function list_products($oc_root_path) {
     echo str_repeat('-', 80) . "\n";
     echo "Общо продукти: {$product_count}\n";
     
-    // Calculate memory usage
+    // Calculate performance metrics
+    $elapsed = microtime(true) - $time_start;
+    $rate = $product_count / $elapsed;
     $memory_end = memory_get_usage();
     $memory_used = ($memory_end - $memory_start) / 1024 / 1024;
     $memory_peak = memory_get_peak_usage() / 1024 / 1024;
     
-    echo "\nИзползвана RAM: " . number_format($memory_used, 2) . " MB\n";
+    echo "\nВреме за обработка: " . number_format($elapsed, 2) . " сек\n";
+    echo "Скорост: " . number_format($rate, 1) . " продукта/сек\n";
+    echo "Използвана RAM: " . number_format($memory_used, 2) . " MB\n";
     echo "Пикова RAM: " . number_format($memory_peak, 2) . " MB\n";
     
     return [
